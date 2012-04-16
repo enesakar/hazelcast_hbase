@@ -13,19 +13,10 @@ import java.util.logging.Logger;
 public class HBaseMapStore implements MapStore<String, User> {
     private Logger logger;
 
-    public static void main(String[] args) {
-        HBaseMapStore mapstore = new HBaseMapStore();
-//        User user = new User();
-//        user.setAge(17);
-//        user.setName("mehmet");
-//        user.setLocation("istanbul");
-//        user.setDetails("details details details");
-//        mapstore.store("user-"+user.getName(), user );
-        System.out.println(mapstore.load("user-mehmet"));
-    }
+
 
     @Override
-    public User load(String key) {
+    public synchronized User load(String key) {
         User user = new User();
         HTable htable = HBaseService.getInstance().getHtable();
         try {
@@ -50,7 +41,7 @@ public class HBaseMapStore implements MapStore<String, User> {
 
 
     @Override
-    public void store(String key, User user) {
+    public synchronized void store(String key, User user) {
         HTable htable = HBaseService.getInstance().getHtable();
         Put put = new Put(Bytes.toBytes(key));
         put.add(Bytes.toBytes("cf_basic"), Bytes.toBytes("name"), Bytes.toBytes(user.getName()));
@@ -65,7 +56,7 @@ public class HBaseMapStore implements MapStore<String, User> {
     }
 
     @Override
-    public void storeAll(Map<String, User> userMap) {
+    public synchronized void storeAll(Map<String, User> userMap) {
         HTable htable = HBaseService.getInstance().getHtable();
         List<Row> rlist = new LinkedList<Row>();
         try {
@@ -87,7 +78,7 @@ public class HBaseMapStore implements MapStore<String, User> {
     }
 
     @Override
-    public void delete(String key) {
+    public synchronized void delete(String key) {
         HTable htable = HBaseService.getInstance().getHtable();
         Delete delete = new Delete(Bytes.toBytes(key));
         try {
@@ -98,7 +89,7 @@ public class HBaseMapStore implements MapStore<String, User> {
     }
 
     @Override
-    public void deleteAll(Collection<String> keys) {
+    public synchronized void deleteAll(Collection<String> keys) {
         HTable htable = HBaseService.getInstance().getHtable();
         List<Row> rlist = new LinkedList<Row>();
         try {
